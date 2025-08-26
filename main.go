@@ -73,7 +73,6 @@ func findAccountByURL(vault *account.VaultWithDB) {
 	outputResultsOfSearch(accounts)
 	
 }
-
 func findAccountByLogin(vault *account.VaultWithDB) {
 	login := promptData("Enter login to search")
 	accounts, _ := vault.FindAccount(login, CheckLogin)
