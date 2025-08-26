@@ -7,7 +7,6 @@ import (
 	// "test/test_app_4/cloud"
 	"test/test_app_4/files"
 	"test/test_app_4/output"
-
 	"github.com/fatih/color"
 )
 
@@ -17,13 +16,22 @@ var menu = map[string] func(*account.VaultWithDB) {
 	"3" : findAccountByLogin,
 	"4" : deleteAccount,
 }
+var menuVariants = []string{
+	"Выберите действие",
+	"1- Создать;",
+	"2- Найти по URL;", 
+	"3- Найти по login;", 
+	"4- Удалить;",
+	"5- Выход.",
+	"Выбор",
+}
 
 func main() {
 	fmt.Println("__ Менеджер паролей __")
 	vault, _ := account.NewVault(files.NewJsonDB("data.json"))
 	// vault, _ := account.NewVault(cloud.NewCloudDB("https://google.com"))
 	for {
-		choise := promptData([]string{"Выберите действие", "1- Создать;", "2- Найти по URL;", "3- Найти по login;", "4- Удалить;", "5- Выход.", "Выбор"})
+		choise := promptData(menuVariants...)
 		if choise == "5" {return}
 		menuFunc := menu[choise]
 		if menuFunc == nil {
@@ -34,7 +42,7 @@ func main() {
 	}
 }
 
-func promptData[T any](prompt []T) string {
+func promptData(prompt ... string) string {
 	var userInput string
 	for pos, elem := range prompt {
 		if pos == len(prompt)-1 {
@@ -48,9 +56,9 @@ func promptData[T any](prompt []T) string {
 }
 
 func createAccount(vault *account.VaultWithDB) {
-	login := promptData([]string{"Введите логин"})
-	password := promptData([]string{"Введите пароль"})
-	url := promptData([]string{"Введите URL"})
+	login := promptData("Введите логин")
+	password := promptData("Введите пароль")
+	url := promptData("Введите URL")
 	myAccount, err := account.NewAccount(login, password, url)
 	if err != nil {
 		output.PrintError(err)
@@ -60,13 +68,14 @@ func createAccount(vault *account.VaultWithDB) {
 }
 
 func findAccountByURL(vault *account.VaultWithDB) {
-	loginURL := promptData([]string{"Enter URL to search"})
+	loginURL := promptData("Enter URL to search")
 	accounts, _ := vault.FindAccount(loginURL, CheckUrl)
 	outputResultsOfSearch(accounts)
 	
 }
+
 func findAccountByLogin(vault *account.VaultWithDB) {
-	login := promptData([]string{"Enter login to search"})
+	login := promptData("Enter login to search")
 	accounts, _ := vault.FindAccount(login, CheckLogin)
 	outputResultsOfSearch(accounts)
 }
@@ -87,7 +96,7 @@ func outputResultsOfSearch (accounts []account.Account) {
 }
 
 func deleteAccount(vault *account.VaultWithDB) {
-	loginURL := promptData([]string{"Enter URL to delete"})
+	loginURL := promptData("Enter URL to delete")
 	err := vault.DeleteAccount(loginURL)
 	if err != nil {
 		output.PrintError(err)
