@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"strings"
+	"test/test_app_4/encrypter"
 	"test/test_app_4/output"
 	"time"
 
@@ -28,9 +29,10 @@ type Vault struct {
 type VaultWithDB struct {
 	Vault
 	db DB
+	enc encrypter.Encrypter
 }
 
-func NewVault(db DB) (*VaultWithDB, error) {
+func NewVault(db DB, enc encrypter.Encrypter) (*VaultWithDB, error) {
 
 	file, err := db.Read()
 	if err != nil {
@@ -40,10 +42,12 @@ func NewVault(db DB) (*VaultWithDB, error) {
 				UpdatedAt: time.Now(),
 			},
 			db: db,
+			enc: enc,
 		}, nil
 	}
+	decFile := enc.Decrup(file)
 	var vault Vault
-	err = json.Unmarshal(file, &vault)
+	err = json.Unmarshal(decFile, &vault)
 	if err != nil {
 		return &VaultWithDB{
 			Vault: Vault{
@@ -51,12 +55,14 @@ func NewVault(db DB) (*VaultWithDB, error) {
 				UpdatedAt: time.Now(),
 			},
 			db: db,
+			enc: enc,
 		}, err
 
 	}
 	return &VaultWithDB{
 		Vault: vault,
 		db:    db,
+		enc: enc,
 	}, nil
 }
 
@@ -115,6 +121,7 @@ func (vault *VaultWithDB) save() error {
 	if err != nil {
 		return err
 	}
-	vault.db.Write(data)
+	encData := vault.enc.Encryp(data)
+	vault.db.Write(encData)
 	return nil
 }
