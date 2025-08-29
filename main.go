@@ -5,13 +5,11 @@ import (
 	"strings"
 	"test/test_app_4/account"
 	"test/test_app_4/encrypter"
-
 	// "test/test_app_4/cloud"
-	"test/test_app_4/files"
-	"test/test_app_4/output"
-
 	"github.com/fatih/color"
 	"github.com/joho/godotenv"
+	"test/test_app_4/files"
+	"test/test_app_4/output"
 )
 
 var menu = map[string]func(*account.VaultWithDB){
@@ -43,7 +41,7 @@ func main() {
 	err := godotenv.Load()
 	if err != nil {
 		output.PrintError(err)
-	} 
+	}
 	counter := counterFunc()
 	vault, _ := account.NewVault(files.NewJsonDB("data.vault"), *encrypter.NewEncrypter())
 	// vault, _ := account.NewVault(cloud.NewCloudDB("https://google.com"))
